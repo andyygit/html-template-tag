@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/slate/bootstrap.min.css" />
+    <title>Test</title>
+    <style>
+      /* https://bootswatch.com/slate/ */
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+      }
+      .btn-sm {
+        padding: 0.1rem 0.35rem;
+      }
+    </style>
+  </head>
+  <body>
+    <template id="my-template">
+      <div class="card text-white bg-primary mb-3 ml-3" style="max-width: 20rem">
+        <div class="card-header">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="deleteMe(this)">X</button>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title"></h4>
+          <p class="card-text"></p>
+        </div>
+      </div>
+    </template>
+    <nav class="navbar sticky-top navbar-expand-lg bg-primary" data-bs-theme="dark">
+      <div class="container">
+        <div class="container-flex">
+          <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="get">Get data</button>
+          <button class="btn btn-secondary my-2 my-sm-0" type="submit" id="delete">Delete all</button>
+        </div>
+      </div>
+    </nav>
+    <div class="container d-flex flex-wrap mt-3" id="output"></div>
+    <script>
+      const deleteMe = (e) => e.parentElement.parentElement.remove();
+      const template = document.getElementById('my-template');
+      const getBtn = document.getElementById('get');
+      const deleteBtn = document.getElementById('delete');
+      getBtn.addEventListener('click', () => {
+        fetch('da.json')
+          .then((res) => res.json())
+          .then((data) => {
+            let card = template.content.querySelector('.card');
+            data.forEach((el) => {
+              let a = document.importNode(card, true);
+              a.children[0].insertBefore(document.createTextNode(el.id), a.children[0].children[0]);
+              a.children[1].children[0].textContent = el.title;
+              a.children[1].children[1].textContent = el.body;
+              document.getElementById('output').appendChild(a);
+            });
+          });
+      });
+      deleteBtn.addEventListener('click', () => {
+        let out = document.getElementById('output');
+        while (out.firstElementChild) {
+          out.lastElementChild.remove();
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+  <body>
+
+    <script>
+      class CounterComponent extends HTMLElement {
+        constructor() {
+          super();
+          const shadowRoot = this.attachShadow({ mode: 'open' });
+          shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        connectedCallback() {
+          this.shadowRoot
+            .querySelector('#increment')
+            .addEventListener('click', () => {
+              const counterDiv = this.shadowRoot.querySelector('#counter');
+              counterDiv.textContent = Number(counterDiv.textContent) + 1;
+            });
+        }
+      }
+
+      customElements.define('counter-component', CounterComponent);
+    </script>
+
+    <counter-component></counter-component>
+  </body>
+</html> -->
